@@ -1,0 +1,63 @@
+﻿@model Shopping.OrderDetailModel
+
+@using ImfuyoRanch.ImfuyoRanchLogic;
+@{ ViewBag.Title = "Order Details"; }
+
+<h2 class="title text-center">@ViewBag.Title</h2>
+
+<div class="row">
+    <h4>Items in this Order</h4>
+    <table class="table">
+        <tr class="table-header-row">
+            <th>
+                Name
+            </th>
+
+            <th>
+                Qty
+            </th>
+            <th>
+                Price
+            </th>
+            <th>
+
+            </th>
+        </tr>
+
+        @foreach (var item in Model.order_items)
+        {
+            <tr>
+                <th>
+                    @Html.DisplayFor(modelItem => item.Item.Name)
+                </th>
+
+                <th>
+                    @Html.DisplayFor(modelItem => item.quantity)
+                </th>
+                <th>
+                    @Html.DisplayFor(modelItem => item.price)
+                </th>
+                <th>
+                    @if (Model.order.status == "Delivered")
+                    {
+                        <a href="@Url.Action("Log_New","Exchange_n_Returns", new { id= Model.order.Order_ID,item_ID =item.item_id })" class="btn btn-default">
+                            Return Item
+                        </a>}
+                </th>
+            </tr>
+}
+        <tr>
+            <td></td>
+            <td></td>
+            <th>@Html.DisplayFor(x => x.order_total)</th>
+        </tr>
+    </table>
+    <div class="row text-center">
+       
+            <a class="btn btn-default" href="@Url.Action("Index", "OrderReports")">
+                <i class="fa fa-angle-left"></i>
+                Back to Reports
+            </a>
+    </div>
+</div>
+

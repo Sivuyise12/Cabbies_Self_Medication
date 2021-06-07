@@ -1,0 +1,233 @@
+﻿@model Shopping.OrderDetailModel
+
+@using ImfuyoRanch.ImfuyoRanchLogic;
+@{ ViewBag.Title = "Order Details";
+    var delveryAddres = $"{Model.address.street_number},{Model.address.street_name},{Model.address.City},{Model.address.State},{Model.address.ZipCode},{Model.address.Country}";
+ }
+
+<h2 class="title text-center">@ViewBag.Title</h2>
+
+<div class="row">
+    <div class="col-md-5">
+        <h4>Order Details</h4>
+        <table class="table">
+            <tr>
+                <th width="140px">Order Number</th>
+                <td>
+                    @Html.DisplayFor(x => x.order.Order_ID)
+                </td>
+            </tr>
+            <tr>
+                <th>Date Requested</th>
+                <td>
+                    @Model.order.date_created.ToLongDateString()
+                </td>
+            </tr>
+            <tr>
+                <th>Shipping</th>
+                <td>
+                    @if (Model.order.shipped)
+                    {
+                        <i class="fa fa-check">@Model.address.street_name @Model.address.street_number</i>
+                    }
+                    else
+                    {
+                        if (ImfuyoLogic.ShippingAddress(Model.order.Order_ID) != null)
+                        {
+
+                            <i class="fa fa-check">@ImfuyoLogic.ShippingAddress(Model.order.Order_ID).street_name</i>
+                            <i class="fa fa-check">@ImfuyoLogic.ShippingAddress(Model.order.Order_ID).street_number</i>
+                            <i class="fa fa-check">@ImfuyoLogic.ShippingAddress(Model.order.Order_ID).ZipCode</i>
+                        }
+                        else
+                        {
+                            <i class="fa fa-ellipsis-h"></i>
+                        }
+
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>
+                    @Html.DisplayFor(x => x.order.status)
+                </td>
+            </tr>
+        </table>
+
+        <table>
+            <tr>
+                @if (Model.order.status != "Deliverd" && User.IsInRole("Customer"))
+                {
+                    <td>
+                        <a href="@Url.Action("Order_Tracking","Orders",new {id = Model.order.Order_ID })" class="btn btn-primary">
+                            Track Order
+                        </a>
+                    </td>
+                }
+
+                @if (User.IsInRole("Admin"))
+                {
+                    if (Model.order.status != "Delivered")
+                    {
+                        if (Model.order.status != "With courier" && Model.order.status == "Awaiting Payment" || Model.order.status == "At warehouse")
+                        {
+                            <td>
+                                <a href="@Url.Action("Mark_As_Packed","Orders",new {id = Model.order.Order_ID })" class="btn btn-primary">
+                                    Mark as Packed
+                                </a>
+                            </td>
+
+                            <td>
+                                <a href="@Url.Action("Create","AssignEmployees",new {id = Model.order.Order_ID })" class="btn btn-success">
+                                    Assign To Driver
+                                </a>
+                            </td>
+                        }
+                    }
+                    if (User.IsInRole("Driver") || User.IsInRole("Admin"))
+                    {
+                        if (Model.order.status == "With courier"|| Model.order.status=="Paid")
+                        {
+                            <td>
+                                <a href="@Url.Action("Mark_As_Deliverd","Orders",new {id = Model.order.Order_ID })" class="btn btn-primary">
+                                    Deliverd
+                                </a>
+                            </td>
+                        }
+                    }
+
+                }
+            </tr>
+        </table>
+    </div>
+
+    <div class="col-md-4">
+
+        @if (Model.shipping_method == "Standard delivery")
+        {
+            <h4>Receipt by Standard Delivery</h4>
+            <table class="table">
+                <tr>
+                    <th>@Html.DisplayNameFor(x => x.address.street_number)</th>
+                    <td>
+                        @Html.DisplayFor(x => x.address.street_number)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(x => x.address.street_name)</th>
+                    <td>
+                        @Html.DisplayFor(x => x.address.street_name)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(x => x.address.City)</th>
+                    <td>
+                        @Html.DisplayFor(x => x.address.City)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(x => x.address.State)</th>
+                    <td>
+                        @Html.DisplayFor(x => x.address.State)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(x => x.address.ZipCode)</th>
+                    <td>
+                        @Html.DisplayFor(x => x.address.ZipCode)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(x => x.address.Country)</th>
+                    <td>
+                        @Html.DisplayFor(x => x.address.Country)
+                    </td>
+                </tr>
+                @if (Model.order.status != "Deliverd")
+                {
+            <tr>
+                <td>
+                    <br />
+                    <a href="@Url.Action("Map","Home",new {address = delveryAddres.ToString()})" class="btn btn-primary">
+                        Track Location
+                    </a>
+                </td>
+            </tr>
+                 
+                }
+            </table> }
+        else
+        {
+            <hr />
+            <p>
+                Collection at our warehouse.
+                <br />
+                <i class="fa fa-map-marker"></i>  21 May St, Durban, 4001
+                <br />
+                <i class="fa fa-clock-o"></i>  8:30 am - 17:00 working hours
+                <br />
+            </p>}
+    </div>
+</div>
+<div class="row">
+    <h4>Items in this Order</h4>
+    <table class="table">
+        <tr class="table-header-row">
+            <th>
+                Name
+            </th>
+
+            <th>
+                Qty
+            </th>
+            <th>
+                Price
+            </th>
+            <th>
+
+            </th>
+        </tr>
+
+        @foreach (var item in Model.order_items)
+        {
+<tr>
+    <th>
+        @Html.DisplayFor(modelItem => item.Item.Name)
+    </th>
+
+    <th>
+        @Html.DisplayFor(modelItem => item.quantity)
+    </th>
+    <th>
+        @Html.DisplayFor(modelItem => item.price)
+    </th>
+    <th>
+        @if (Model.order.status == "Deliverd" && User.IsInRole("Customer"))
+        {
+         <a href="@Url.Action("Create","ItemRatings", new { orderID= Model.order.Order_ID,id =item.item_id })" class="btn btn-success"> Rate Item</a>     
+        }
+    </th>
+</tr>}
+        <tr>
+            <td></td>
+            <td></td>
+            <th>@Html.DisplayFor(x => x.order_total)</th>
+        </tr>
+    </table>
+    <div class="row text-center">
+        @if (User.IsInRole("Customer"))
+        {
+<a class="btn btn-default" href="@Url.Action("Order_History", "Orders")">
+    <i class="fa fa-angle-left"></i>
+    Back to List
+</a> }
+            else
+            {
+<a class="btn btn-default" href="@Url.Action("Customer_Orders", "Orders")">
+    <i class="fa fa-angle-left"></i>
+    Back to List
+</a>}
+    </div>
+</div>
+

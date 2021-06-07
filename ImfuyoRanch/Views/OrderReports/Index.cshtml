@@ -1,0 +1,78 @@
+﻿@model IEnumerable<ImfuyoRanch.Models.OrderReports>
+@using ImfuyoRanch.ImfuyoRanchLogic;
+
+@{
+    ViewBag.Title = "Index";
+    ViewBag.SalesAmount = ImfuyoLogic.CalcTotalOrderAmount();
+}
+
+<h2 style="text-align:center !important;">Order Reports</h2>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <h4 class="hd" style="text-align:right !important;">Total Orders Amount : R @ViewBag.SalesAmount </h4>
+    </div>
+</div>
+<table class="table table-hover table-striped table-responsive" id="my_list">
+    <thead>
+        <tr class="table-header-row">
+            <th>
+                @Html.DisplayNameFor(model => model.OrderId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateCreated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderAmount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CustomerEmail)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateCreated)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderAmount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CustomerEmail)
+                </td>
+                <td>
+                    <a href="@Url.Action("Order_Details","OrderReports", new { id=item.OrderId })" rel="tooltip" title="View" class="btn btn-info btn-simple btn-xs"><i class="fa fa-eye"></i></a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script type="text/javascript">
+    $('#my_list').dataTable(
+         {
+             dom: 'Bfrtip',
+             lengthMenu: [
+                 [10, 25, 50, -1],
+                 ['10 Orders', '25 Orders', '50 Orders', 'Show all']
+             ],
+             buttons: [
+                 'pageLength', 'csv', 'print'
+             ],
+             //language: { search: "" },
+             //select: true
+         }
+     );
+     $(".dataTables_filter input").addClass("search-input");
+     $(".dataTables_filter input").attr('placeholder', 'Search');
+     $('#my_list')
+         .removeClass('display')
+         .addClass('table table-striped table-hover');</script>

@@ -1,0 +1,61 @@
+﻿@model IEnumerable<ImfuyoRanch.Models.AssignEmployee>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+@if (User.IsInRole("Admin"))
+{
+    <h2>All Deliveries</h2>
+}
+else
+{
+    <h2>My Deliveries</h2>
+}
+
+
+<table class="table table-striped">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Employee.EmployeeName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Order.Order_ID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DateAssigned)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Status)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Employee.EmployeeName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Order.Order_ID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateAssigned)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+
+                @Html.ActionLink("Details", "Details", new { id = item.AssignEmployeeId })
+                @if (User.IsInRole("Admin") && item.Status!="Deliverd")
+                {
+                    @Html.ActionLink("Delete", "Delete", new { id = item.AssignEmployeeId })
+                }
+                <a href="@Url.Action("Order_Details","Orders", new { id=item.Order_ID })" rel="tooltip" title="View" class="btn btn-info btn-simple btn-xs"><i class="fa fa-eye"></i></a>
+            </td>
+        </tr>
+    }
+
+</table>
